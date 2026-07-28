@@ -1,0 +1,7 @@
+/vendor/
+/build/
+/composer.lock
+/.idea/
+.DS_Store
+auth.json
+gitlab-token.txt
