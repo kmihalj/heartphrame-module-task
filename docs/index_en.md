@@ -109,3 +109,8 @@ selected scope.
 Uninstalling or disabling Task does not prevent the HTML Editor from loading.
 The declarative list remains HTML content, while interactive state controls
 are simply no longer rendered.
+
+## 7. API integration
+
+The optional API module exposes ACL-aware task reads, state changes, and audit.
+Definitions remain part of Editor page writes. See [API integration](api_en.md).

@@ -108,3 +108,9 @@ provjerili odabrani opseg.
 Isključivanje Task modula ne sprječava učitavanje HTML Editora. Deklarativna
 lista ostaje dio HTML sadržaja, a interaktivne kontrole stanja više se ne
 renderiraju.
+
+## 7. API integracija
+
+Opcionalni API modul izlaže čitanje zadataka, promjenu stanja i audit uz ACL
+provjeru. Definicije ostaju dio izmjene Editor stranice. Vidi
+[API integraciju](api_hr.md).

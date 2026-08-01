@@ -1,5 +1,7 @@
 # HeartPhrame Task modul
 
+[English version](README.md)
+
 Task modul dodaje interaktivne popise zadataka s audit tragom u verzionirane
 HeartPhrame HTML dokumente.
 
@@ -16,6 +18,7 @@ English documentation: [README.md](README.md)
 - statičan i siguran prikaz nacrta, povijesti, filesystem snapshota i ZIP exporta
 - prijenosna ORM shema za SQLite, PostgreSQL i MySQL/MariaDB
 - bez vanjskog JavaScript frameworka, seeda i probnih podataka
+- opcionalni HTTP API za stanje i audit uz ACL provjeru
 
 Definicije zadataka, tekst, redoslijed i opseg prava ostaju u dokumentu. Baza
 sadrži samo promjenjivo stanje izvršenosti i njegov audit trag.
@@ -66,9 +69,16 @@ samo kada se stanje stvarno promijeni.
 ## Dokumentacija
 
 Detaljna arhitektura, model pohrane, integracijski ugovor i operativne upute
-nalaze se u [docs/index_hr.md](docs/index_hr.md).
+nalaze se u [docs/index_hr.md](docs/index_hr.md). Vidi i
+[API integraciju](docs/api_hr.md).
 
 ## Licenca
 
 Modul je objavljen pod
 [European Union Public License (EUPL) v1.2](LICENSE).
+
+## Politika ovisnosti
+
+Framework i interni HeartPhrame moduli zahtijevaju se s pomične grane
+`dev-main`. Ovaj modul ne sprema `composer.lock`; CI dohvaća najnovija
+razvojna stanja i pokreće cijeli skup provjera `composer on-commit`.

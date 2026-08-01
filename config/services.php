@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorApiActorContext;
 use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorService;
 use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorWorkspaceIntegration;
 use AaiEduHr\HeartPhrameModuleOrm\Database\Database;
+use AaiEduHr\HeartPhrameModuleTask\Api\TaskApiService;
 use AaiEduHr\HeartPhrameModuleTask\Command\HpTaskCommand;
 use AaiEduHr\HeartPhrameModuleTask\Controller\TaskController;
 use AaiEduHr\HeartPhrameModuleTask\Service\TaskDefinitionParser;
@@ -19,6 +21,14 @@ use HeartPhrame\Session\SessionInterface;
 use Psr\Container\ContainerInterface;
 
 return [
+    TaskApiService::class => static fn(ContainerInterface $container): TaskApiService =>
+        new TaskApiService(
+            $container->get(EditorApiActorContext::class),
+            $container->get(TaskDocumentAccess::class),
+            $container->get(TaskDefinitionParser::class),
+            $container->get(TaskStateService::class),
+        ),
+
     TaskDefinitionParser::class => static fn(): TaskDefinitionParser => new TaskDefinitionParser(),
 
     TaskStateService::class => static fn(ContainerInterface $container): TaskStateService =>
@@ -30,6 +40,7 @@ return [
             $container->get(AuthnHandlerInterface::class),
             $container->get(EditorWorkspaceIntegration::class),
             $container->get(TaskDefinitionParser::class),
+            $container->get(EditorApiActorContext::class),
         ),
 
     TaskHtmlRenderer::class => static fn(ContainerInterface $container): TaskHtmlRenderer =>

@@ -1,5 +1,7 @@
 # HeartPhrame Task Module
 
+[Hrvatska verzija](README_hr.md)
+
 The Task module adds interactive, audited task lists to versioned HeartPhrame
 HTML documents.
 
@@ -16,6 +18,7 @@ Croatian documentation: [README_hr.md](README_hr.md)
 - static and safe draft, history, filesystem snapshot, and ZIP export output
 - portable ORM schema for SQLite, PostgreSQL, and MySQL/MariaDB
 - no external JavaScript framework and no seed or sample data
+- optional ACL-aware HTTP API for task state and audit
 
 Task definitions, labels, order, and permission scope remain in the document.
 The database contains only mutable completion state and its audit trail.
@@ -66,9 +69,16 @@ when the state actually changes.
 ## Documentation
 
 The detailed architecture, storage model, integration contract, and operating
-guide are in [docs/index_en.md](docs/index_en.md).
+guide are in [docs/index_en.md](docs/index_en.md). See also
+[API integration](docs/api_en.md).
 
 ## Licence
 
 This work is published under the
 [European Union Public License (EUPL) v1.2](LICENSE).
+
+## Dependency policy
+
+The Framework and internal HeartPhrame modules are required from the moving
+`dev-main` branch. This module does not commit `composer.lock`; CI resolves
+the latest development heads and runs the complete `composer on-commit` suite.

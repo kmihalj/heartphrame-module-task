@@ -31,8 +31,8 @@ jobs:
       - name: Validate Composer metadata
         run: composer validate --strict --no-interaction
 
-      - name: Install dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader
+      - name: Resolve latest dependencies / Dohvati najnovije ovisnosti
+        run: composer update --with-all-dependencies --no-interaction --no-progress --prefer-dist --optimize-autoloader
 
       - name: Check platform requirements
         run: composer check-platform-reqs

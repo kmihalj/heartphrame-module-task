@@ -3,7 +3,8 @@
     "description": "Interactive, audited task lists for HeartPhrame HTML documents.",
     "type": "heartphrame-module",
     "license": "EUPL-1.2",
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "repositories": [
         {
             "type": "vcs",
@@ -25,10 +26,10 @@
     "require": {
         "php": ">=8.2",
         "ext-dom": "*",
-        "aaieduhr/heartphrame-framework": ">=0.0.22 <1.0",
-        "aaieduhr/heartphrame-module-auth": "^1.1",
-        "aaieduhr/heartphrame-module-orm": "^1.1.2",
-        "aaieduhr/heartphrame-module-editor-html": "^0.1 || dev-main"
+        "aaieduhr/heartphrame-framework": "dev-main",
+        "aaieduhr/heartphrame-module-auth": "dev-main",
+        "aaieduhr/heartphrame-module-orm": "dev-main",
+        "aaieduhr/heartphrame-module-editor-html": "dev-main"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
@@ -58,6 +59,10 @@
         }
     ],
     "config": {
+        "github-protocols": [
+            "https"
+        ],
+        "use-github-api": false,
         "sort-packages": true,
         "cache-dir": "build/composer",
         "allow-plugins": {

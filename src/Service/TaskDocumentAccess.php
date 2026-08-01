@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AaiEduHr\HeartPhrameModuleTask\Service;
 
+use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorApiActorContext;
 use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorDocument;
 use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorDocumentVersion;
 use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorService;
@@ -23,7 +24,7 @@ use function trim;
  * EN: Resolves published HTML documents and checks task-change permission.
  *     This keeps the Task module from duplicating Editor or Workspace ACL rules.
  */
-final readonly class TaskDocumentAccess
+final readonly class TaskDocumentAccess implements TaskApiDocumentAccessInterface
 {
     /**
      * HR: Prima Editor kao izvor dokumenta, auth kontekst i opcionalni Workspace most.
@@ -34,6 +35,7 @@ final readonly class TaskDocumentAccess
         private AuthnHandlerInterface $authnHandler,
         private EditorWorkspaceIntegration $workspace,
         private TaskDefinitionParser $definitions,
+        private EditorApiActorContext $apiActors,
     ) {
     }
 
@@ -111,6 +113,26 @@ final readonly class TaskDocumentAccess
     }
 
     /**
+     * HR: Pronalazi task u aktualnoj objavi nakon provjere prava čitanja dokumenta.
+     * EN: Finds a task in the current publication after checking document read access.
+     */
+    public function taskForRead(
+        string $documentId,
+        string $language,
+        string $taskUuid,
+    ): TaskDefinition {
+        $definition = $this->definitions->find(
+            $this->publishedHtml($documentId, $language),
+            trim($taskUuid),
+        );
+        if (!$definition instanceof TaskDefinition) {
+            throw new RuntimeException(__('Zadatak ne postoji u aktualnoj objavi dokumenta.'));
+        }
+
+        return $definition;
+    }
+
+    /**
      * HR: Vraća stabilni identitet korisnika za audit zapisa.
      * EN: Returns the stable current-user identity used by audit records.
      *
@@ -170,7 +192,7 @@ final readonly class TaskDocumentAccess
      */
     private function currentUser(): ?array
     {
-        $user = $this->authnHandler->userData();
+        $user = $this->apiActors->actor() ?? $this->authnHandler->userData();
         if (!is_array($user) || !is_numeric($user['id'] ?? null)) {
             return null;
         }
