@@ -5,6 +5,28 @@
 Task modul dodaje interaktivne popise zadataka s audit tragom u verzionirane
 HeartPhrame HTML dokumente.
 
+## Ovisnosti
+
+Obavezno, redoslijedom uključivanja:
+
+1. `aaieduhr/heartphrame-framework` (`dev-main`)
+2. `aaieduhr/heartphrame-module-orm` (`dev-main`)
+3. `aaieduhr/heartphrame-module-auth` (`dev-main`)
+4. `aaieduhr/heartphrame-module-editor-html` (`dev-main`)
+5. `aaieduhr/heartphrame-module-task` (`dev-main`)
+
+Opcionalne integracije:
+
+- Workspace daje naslijeđena prava pregleda i uređivanja.
+- API izlaže stanje objavljenih zadataka i nepromjenjivi audit.
+- Notification je pripremljen za buduće dodjele i obavijesti o rokovima.
+
+```bash
+composer require aaieduhr/heartphrame-module-task:dev-main
+vendor/bin/hph task:install-migration
+vendor/bin/hph orm-migrate:up
+```
+
 English documentation: [README.md](README.md)
 
 ## Mogućnosti

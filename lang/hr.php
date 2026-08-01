@@ -17,8 +17,8 @@ return [
         'Objavljena verzija dokumenta nije pronađena.',
     'Podaci zadatka nisu potpuni.' => 'Podaci zadatka nisu potpuni.',
     'Početna Task migracija nije pronađena.' => 'Početna Task migracija nije pronađena.',
-    'Sljedeći korak: pokreni `vendor/bin/hph orm-migrate up`.' =>
-        'Sljedeći korak: pokreni `vendor/bin/hph orm-migrate up`.',
+    'Sljedeći korak: pokreni `vendor/bin/hph orm-migrate:up`.' =>
+        'Sljedeći korak: pokreni `vendor/bin/hph orm-migrate:up`.',
     'Spremljeno stanje zadatka nije moguće učitati.' =>
         'Spremljeno stanje zadatka nije moguće učitati.',
     'Task tablice nisu instalirane.' => 'Task tablice nisu instalirane.',

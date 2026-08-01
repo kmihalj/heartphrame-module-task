@@ -5,6 +5,28 @@
 The Task module adds interactive, audited task lists to versioned HeartPhrame
 HTML documents.
 
+## Dependencies
+
+Required, in enable order:
+
+1. `aaieduhr/heartphrame-framework` (`dev-main`)
+2. `aaieduhr/heartphrame-module-orm` (`dev-main`)
+3. `aaieduhr/heartphrame-module-auth` (`dev-main`)
+4. `aaieduhr/heartphrame-module-editor-html` (`dev-main`)
+5. `aaieduhr/heartphrame-module-task` (`dev-main`)
+
+Optional integrations:
+
+- Workspace supplies inherited view/edit permissions.
+- API exposes published task state and immutable audit endpoints.
+- Notification is reserved for assignment and due-date notification workflows.
+
+```bash
+composer require aaieduhr/heartphrame-module-task:dev-main
+vendor/bin/hph task:install-migration
+vendor/bin/hph orm-migrate:up
+```
+
 Croatian documentation: [README_hr.md](README_hr.md)
 
 ## Features

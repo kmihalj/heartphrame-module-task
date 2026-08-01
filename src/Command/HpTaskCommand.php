@@ -85,7 +85,7 @@ final readonly class HpTaskCommand
         }
 
         echo __('Kreirana je početna Task migracija: ') . $target . PHP_EOL;
-        echo __('Sljedeći korak: pokreni `vendor/bin/hph orm-migrate up`.') . PHP_EOL;
+        echo __('Sljedeći korak: pokreni `vendor/bin/hph orm-migrate:up`.') . PHP_EOL;
 
         return 0;
     }
