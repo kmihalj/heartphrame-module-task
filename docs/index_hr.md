@@ -114,3 +114,6 @@ renderiraju.
 Opcionalni API modul izlaže čitanje zadataka, promjenu stanja i audit uz ACL
 provjeru. Definicije ostaju dio izmjene Editor stranice. Vidi
 [API integraciju](api_hr.md).
+
+Vidi [sigurnosnu kopiju i povrat](backup_hr.md) za potpuno stanje/povijest
+zadataka i backup ograničen na područje.

@@ -114,3 +114,6 @@ are simply no longer rendered.
 
 The optional API module exposes ACL-aware task reads, state changes, and audit.
 Definitions remain part of Editor page writes. See [API integration](api_en.md).
+
+See [Backup and restore](backup_en.md) for complete and workspace-scoped task
+state and audit history.

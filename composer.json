@@ -39,6 +39,7 @@
         "slevomat/coding-standard": "^8"
     },
     "suggest": {
+        "aaieduhr/heartphrame-module-backup": "Adds backup and restore for task states and task history.",
         "aaieduhr/heartphrame-module-api": "Exposes task state and audit endpoints for published Editor pages.",
         "aaieduhr/heartphrame-module-workspace": "Applies inherited Workspace view and edit permissions to task changes.",
         "aaieduhr/heartphrame-module-notification": "Can be used later for task assignment and due-date notifications."

@@ -93,6 +93,7 @@ samo kada se stanje stvarno promijeni.
 Detaljna arhitektura, model pohrane, integracijski ugovor i operativne upute
 nalaze se u [docs/index_hr.md](docs/index_hr.md). Vidi i
 [API integraciju](docs/api_hr.md).
+Backup i povrat opisani su u [docs/backup_hr.md](docs/backup_hr.md).
 
 ## Licenca
 

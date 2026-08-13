@@ -93,6 +93,7 @@ when the state actually changes.
 The detailed architecture, storage model, integration contract, and operating
 guide are in [docs/index_en.md](docs/index_en.md). See also
 [API integration](docs/api_en.md).
+Backup and restore are covered in [docs/backup_en.md](docs/backup_en.md).
 
 ## Licence
 
