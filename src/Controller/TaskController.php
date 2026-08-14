@@ -10,6 +10,7 @@ use HeartPhrame\Http\ResponseFactory;
 use HeartPhrame\Session\SessionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 use function filter_var;
@@ -35,6 +36,7 @@ final readonly class TaskController
         private SessionInterface $session,
         private TaskDocumentAccess $access,
         private TaskStateService $states,
+        private ?LoggerInterface $technicalLogger = null,
     ) {
     }
 
@@ -74,6 +76,13 @@ final readonly class TaskController
                 $identity['display_name'],
             );
         } catch (Throwable $throwable) {
+            $this->technicalLogger?->warning('Task state operation failed.', [
+                'module' => 'task',
+                'document_id' => $documentId,
+                'task_uuid' => $taskUuid,
+                'exception' => $throwable,
+            ]);
+
             return $this->responseFactory->json([
                 'ok' => false,
                 'error' => $throwable->getMessage(),
@@ -102,6 +111,13 @@ final readonly class TaskController
             $this->access->taskForChange($documentId, $language, $taskUuid);
             $events = $this->states->history($documentId, $taskUuid);
         } catch (Throwable $throwable) {
+            $this->technicalLogger?->warning('Task history operation failed.', [
+                'module' => 'task',
+                'document_id' => $documentId,
+                'task_uuid' => $taskUuid,
+                'exception' => $throwable,
+            ]);
+
             return $this->responseFactory->json([
                 'ok' => false,
                 'error' => $throwable->getMessage(),
