@@ -7,6 +7,8 @@ use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorService;
 use AaiEduHr\HeartPhrameModuleEditorHtml\Service\EditorWorkspaceIntegration;
 use AaiEduHr\HeartPhrameModuleOrm\Database\Database;
 use AaiEduHr\HeartPhrameModuleTask\Api\TaskApiService;
+use AaiEduHr\HeartPhrameModuleTask\Api\TaskApiExtension;
+use AaiEduHr\HeartPhrameModuleTask\Api\TaskResourceController;
 use AaiEduHr\HeartPhrameModuleTask\Command\HpTaskCommand;
 use AaiEduHr\HeartPhrameModuleTask\Controller\TaskController;
 use AaiEduHr\HeartPhrameModuleTask\Service\TaskDefinitionParser;
@@ -63,6 +65,22 @@ $services = [
         new HpTaskCommand($container->get(ConfigInterface::class)),
 ];
 
+// HR: API adapteri postoje samo kada je generički API modul instaliran.
+// EN: API adapters exist only when the generic API module is installed.
+if (interface_exists(\AaiEduHr\HeartPhrameModuleApi\Contract\ApiExtensionInterface::class)) {
+    $services[TaskApiExtension::class] =
+        static fn(): TaskApiExtension => new TaskApiExtension();
+    $services[TaskResourceController::class] =
+        static fn(ContainerInterface $container): TaskResourceController =>
+            new TaskResourceController(
+                $container->get(\AaiEduHr\HeartPhrameModuleApi\Http\ApiResponseFactory::class),
+                $container->get(TaskApiService::class),
+                $container->get(ConfigInterface::class),
+                $container->get(\AaiEduHr\HeartPhrameModuleApi\Service\ApiCursorPaginator::class),
+                $container->get(\AaiEduHr\HeartPhrameModuleApi\Service\ApiEntityTagService::class),
+            );
+}
+
 if (class_exists(\AaiEduHr\HeartPhrameModuleBackup\Service\DatabaseTableBackupProvider::class)) {
     $services['heartphrame.backup.provider.task'] =
         static fn(ContainerInterface $container): \AaiEduHr\HeartPhrameModuleBackup\Service\DatabaseTableBackupProvider =>
@@ -113,6 +131,7 @@ if (
                         'Workspace does not exist: ' . $identifier,
                     );
                 }
+
                 $rows = $database->table(\AaiEduHr\HeartPhrameModuleWorkspace\ModuleWorkspace::TABLE_WORKSPACE_NODES)
                     ->select(['document_key'])
                     ->where('workspace_id', '=', (int)$workspace['id'])

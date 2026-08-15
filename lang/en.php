@@ -25,4 +25,14 @@ return [
     'Za promjenu zadatka potrebna je prijava.' => 'You must sign in to change this task.',
     'Zadatak ne postoji u aktualnoj objavi dokumenta.' =>
         'The task does not exist in the current published document.',
+    'API ključ nema potreban scope "%s".' => 'The API key is missing the required "%s" scope.',
+    'Interna greška' => 'Internal error',
+    'JSON tijelo mora biti objekt.' => 'The JSON body must be an object.',
+    'Neispravan JSON' => 'Invalid JSON',
+    'Polje "completed" mora biti true ili false.' => 'The "completed" field must be true or false.',
+    'Pristup nije dozvoljen' => 'Access denied',
+    'Task operaciju nije moguće izvršiti' => 'The Task operation could not be completed',
+    'Uvjet izmjene nije ispunjen' => 'The change precondition was not met',
+    'Zahtjev nije moguće obraditi. Obrati se administratoru uz request ID.' =>
+        'The request could not be processed. Contact the administrator and include the request ID.',
 ];

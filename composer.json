@@ -21,6 +21,10 @@
         {
             "type": "vcs",
             "url": "https://gitlab.opencode.hr/srce/aai-eduhr/heartphrame/heartphrame-module-html-editor.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/kmihalj/heartphrame-module-API.git"
         }
     ],
     "require": {
@@ -32,6 +36,7 @@
         "aaieduhr/heartphrame-module-editor-html": "dev-main"
     },
     "require-dev": {
+        "aaieduhr/heartphrame-module-api": "dev-main",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^10 || ^11",
         "rector/rector": "^2.0",

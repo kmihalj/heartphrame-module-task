@@ -35,4 +35,5 @@ stranice HTML Editora. Strukturirani Editor `content` ugovor prihvaća bilo koji
 broj `task_list` blokova. Task API rute koriste se samo za operativno stanje
 checkboxa.
 
-Potpuna referenca HTTP ruta nalazi se u API modulu.
+`TaskApiExtension` posjeduje deklaracije četiriju HTTP ruta, a
+`TaskResourceController` prilagođava ovaj servis samo kada je API prisutan.

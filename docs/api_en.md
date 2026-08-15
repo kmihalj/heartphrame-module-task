@@ -34,4 +34,5 @@ Create, remove, rename, and reorder task lists through an HTML Editor page
 write. The Editor structured `content` contract accepts any number of
 `task_list` blocks. Use Task API routes only for operational checkbox state.
 
-The complete HTTP route reference is in the API module.
+`TaskApiExtension` owns the four HTTP route declarations and
+`TaskResourceController` adapts this service only when API is present.

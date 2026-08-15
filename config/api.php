@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 return [
     'module' => 'task',
+    'extension' => \AaiEduHr\HeartPhrameModuleTask\Api\TaskApiExtension::class,
     'resources' => [
         'task' => [
             'label' => ['hr' => 'Zadaci', 'en' => 'Tasks'],

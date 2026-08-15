@@ -25,4 +25,14 @@ return [
     'Za promjenu zadatka potrebna je prijava.' => 'Za promjenu zadatka potrebna je prijava.',
     'Zadatak ne postoji u aktualnoj objavi dokumenta.' =>
         'Zadatak ne postoji u aktualnoj objavi dokumenta.',
+    'API ključ nema potreban scope "%s".' => 'API ključ nema potreban scope "%s".',
+    'Interna greška' => 'Interna greška',
+    'JSON tijelo mora biti objekt.' => 'JSON tijelo mora biti objekt.',
+    'Neispravan JSON' => 'Neispravan JSON',
+    'Polje "completed" mora biti true ili false.' => 'Polje "completed" mora biti true ili false.',
+    'Pristup nije dozvoljen' => 'Pristup nije dozvoljen',
+    'Task operaciju nije moguće izvršiti' => 'Task operaciju nije moguće izvršiti',
+    'Uvjet izmjene nije ispunjen' => 'Uvjet izmjene nije ispunjen',
+    'Zahtjev nije moguće obraditi. Obrati se administratoru uz request ID.' =>
+        'Zahtjev nije moguće obraditi. Obrati se administratoru uz request ID.',
 ];
