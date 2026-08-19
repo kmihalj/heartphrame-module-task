@@ -43,7 +43,7 @@ final class TaskHtmlRendererTest extends TestCase
         ]);
         $this->database = new Database($config, $helper);
         $migration = require dirname(__DIR__) . '/resources/migrations/initial_task_schema.php';
-        self::assertInstanceOf(ReversibleMigrationInterface::class, $migration);
+        $this->assertInstanceOf(ReversibleMigrationInterface::class, $migration);
         $migration->up($this->database);
     }
 
@@ -96,12 +96,12 @@ HTML;
 
         $rendered = $renderer->render($html, 'document-a', 'hr', false);
 
-        self::assertSame(2, substr_count($rendered, 'class="editor-task-list-audit"'));
-        self::assertStringNotContainsString('class="editor-task-audit"', $rendered);
-        self::assertStringContainsString('Zadnja promjena: Nova promjena · 18.08.2026. 09:30:00', $rendered);
-        self::assertStringNotContainsString('Zadnja promjena: Stara promjena', $rendered);
-        self::assertStringContainsString('Zadnja promjena: Druga lista · 16.08.2026. 07:00:00', $rendered);
-        self::assertStringContainsString('data-task-list-label="Prva lista"', $rendered);
+        $this->assertSame(2, substr_count($rendered, 'class="editor-task-list-audit"'));
+        $this->assertStringNotContainsString('class="editor-task-audit"', $rendered);
+        $this->assertStringContainsString('Zadnja promjena: Nova promjena · 18.08.2026. 09:30:00', $rendered);
+        $this->assertStringNotContainsString('Zadnja promjena: Stara promjena', $rendered);
+        $this->assertStringContainsString('Zadnja promjena: Druga lista · 16.08.2026. 07:00:00', $rendered);
+        $this->assertStringContainsString('data-task-list-label="Prva lista"', $rendered);
     }
 
     /** HR: Sprema kontrolirano stanje jednog retka. EN: Stores one row's controlled state. */

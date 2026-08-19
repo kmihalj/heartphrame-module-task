@@ -132,10 +132,10 @@ final class TaskStateServiceTest extends TestCase
         (new TaskStateService($this->database, $events))
             ->setState($task, 'document-a', true, 7, 'Ana Horvat');
 
-        self::assertCount(1, $events->dispatched);
-        self::assertInstanceOf(TaskChanged::class, $events->dispatched[0]);
-        self::assertSame($task->listUuid, $events->dispatched[0]->listUuid);
-        self::assertSame($task->listLabel, $events->dispatched[0]->listLabel);
-        self::assertSame($task->uuid, $events->dispatched[0]->taskUuid);
+        $this->assertCount(1, $events->dispatched);
+        $this->assertInstanceOf(TaskChanged::class, $events->dispatched[0]);
+        $this->assertSame($task->listUuid, $events->dispatched[0]->listUuid);
+        $this->assertSame($task->listLabel, $events->dispatched[0]->listLabel);
+        $this->assertSame($task->uuid, $events->dispatched[0]->taskUuid);
     }
 }

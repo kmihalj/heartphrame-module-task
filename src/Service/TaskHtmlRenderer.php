@@ -179,7 +179,9 @@ final readonly class TaskHtmlRenderer
                 } else {
                     $audit->setAttribute('hidden', 'hidden');
                 }
+
                 $meta->appendChild($audit);
+
                 $this->insertListMeta($xpath, $list, $meta);
 
                 if (
