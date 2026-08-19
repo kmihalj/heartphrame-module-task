@@ -78,8 +78,19 @@ final readonly class TaskHtmlRenderer
             array_values(array_column($definitions, 'uuid')),
         );
         $byUuid = [];
+        $byListUuid = [];
+        $latestStateByListUuid = [];
         foreach ($definitions as $definition) {
             $byUuid[$definition->uuid] = $definition;
+            $byListUuid[$definition->listUuid][] = $definition;
+
+            $candidate = is_array($stateRows[$definition->uuid] ?? null)
+                ? $stateRows[$definition->uuid]
+                : [];
+            $current = $latestStateByListUuid[$definition->listUuid] ?? null;
+            if ($candidate !== [] && $this->isNewerState($candidate, is_array($current) ? $current : null)) {
+                $latestStateByListUuid[$definition->listUuid] = $candidate;
+            }
         }
 
         $xpath = new DOMXPath($document);
@@ -111,7 +122,6 @@ final readonly class TaskHtmlRenderer
                 $document,
                 $item,
                 $definition,
-                $state,
                 $completed,
                 $canToggle,
                 $documentId,
@@ -127,13 +137,74 @@ final readonly class TaskHtmlRenderer
                     continue;
                 }
 
+                $listUuid = trim($list->getAttribute('data-task-list-uuid'));
+                $listDefinitions = $byListUuid[$listUuid] ?? [];
+                $firstDefinition = $listDefinitions[0] ?? null;
+                if (!$firstDefinition instanceof TaskDefinition) {
+                    continue;
+                }
+
+                $listLabel = trim($firstDefinition->listLabel) !== ''
+                    ? trim($firstDefinition->listLabel)
+                    : $labels['list'];
                 $list->setAttribute('class', 'editor-task-list');
                 $list->setAttribute('data-task-state-url', $this->statePath());
                 $list->setAttribute('data-task-csrf-url', $this->csrfPath());
+                $list->setAttribute('data-task-document', $documentId);
+                $list->setAttribute('data-task-language', $language);
+                $list->setAttribute('data-task-list-label', $listLabel);
                 $list->setAttribute('data-task-last-changed-label', $labels['last_changed']);
                 $list->setAttribute('data-task-close-label', $labels['close']);
                 $list->setAttribute('data-task-csrf-error', $labels['csrf_error']);
                 $list->setAttribute('data-task-save-error', $labels['save_error']);
+
+                /*
+                 * HR: Jedna lista dobiva jedan zajednički audit red. Najnovije
+                 *     stanje svih njezinih zadataka predstavlja zadnju promjenu.
+                 * EN: One list receives one shared audit row. The newest state
+                 *     across its tasks represents the list's last change.
+                 */
+                $meta = $document->createElement('div');
+                $meta->setAttribute('class', 'editor-task-list-meta');
+                $audit = $document->createElement('small');
+                $audit->setAttribute('class', 'editor-task-list-audit');
+                $auditText = $this->auditText(
+                    is_array($latestStateByListUuid[$listUuid] ?? null)
+                        ? $latestStateByListUuid[$listUuid]
+                        : [],
+                    $language,
+                );
+                if ($auditText !== '') {
+                    $audit->appendChild($document->createTextNode($auditText));
+                } else {
+                    $audit->setAttribute('hidden', 'hidden');
+                }
+                $meta->appendChild($audit);
+                $this->insertListMeta($xpath, $list, $meta);
+
+                if (
+                    $interactive
+                    && $this->access->isAuthenticated()
+                    && $this->urlGenerator->namedRouteExists('simbioza-user.toggle')
+                    && $this->urlGenerator->namedRouteExists('simbioza-user.status')
+                ) {
+                    /*
+                     * HR: Task modul izlaže neutralne DOM podatke samo kada je
+                     *     aplikacijski modul praćenja stvarno uključen.
+                     * EN: The Task module exposes neutral DOM data only when the
+                     *     application following module is actually enabled.
+                     */
+                    $list->setAttribute(
+                        'data-task-follow-toggle-url',
+                        $this->urlGenerator->getPathFor('simbioza-user.toggle'),
+                    );
+                    $list->setAttribute(
+                        'data-task-follow-status-url',
+                        $this->urlGenerator->getPathFor('simbioza-user.status'),
+                    );
+                    $list->setAttribute('data-task-follow-label', $labels['follow']);
+                    $list->setAttribute('data-task-unfollow-label', $labels['unfollow']);
+                }
             }
         }
 
@@ -151,16 +222,13 @@ final readonly class TaskHtmlRenderer
     }
 
     /**
-     * HR: Zamjenjuje sadržaj jednog LI elementa checkboxom, tekstom i auditom.
-     * EN: Replaces one LI element's content with a checkbox, text, and audit metadata.
-     *
-     * @param array<string, mixed> $state
+     * HR: Zamjenjuje sadržaj jednog LI elementa isključivo checkboxom i tekstom zadatka.
+     * EN: Replaces one LI element's content with only the task checkbox and text.
      */
     private function renderItem(
         DOMDocument $document,
         DOMElement $item,
         TaskDefinition $definition,
-        array $state,
         bool $completed,
         bool $canToggle,
         string $documentId,
@@ -200,18 +268,70 @@ final readonly class TaskHtmlRenderer
         $label->appendChild($text);
 
         $item->appendChild($label);
+    }
 
-        $meta = $document->createElement('small');
-        $meta->setAttribute('class', 'editor-task-audit');
+    /**
+     * HR: Umeće zajednički red neposredno iza naslova liste, odnosno na početak liste bez naslova.
+     * EN: Inserts the shared row immediately after the list heading, or first in a heading-less list.
+     */
+    private function insertListMeta(DOMXPath $xpath, DOMElement $list, DOMElement $meta): void
+    {
+        $headings = $xpath->query('./*[self::h2 or self::h3 or self::h4][1]', $list);
+        $heading = $headings === false ? null : $headings->item(0);
+        if ($heading instanceof DOMNode) {
+            $next = $heading->nextSibling;
+            if ($next instanceof DOMNode) {
+                $list->insertBefore($meta, $next);
 
-        $audit = $this->auditText($state, $language);
-        if ($audit !== '') {
-            $meta->appendChild($document->createTextNode($audit));
-        } else {
-            $meta->setAttribute('hidden', 'hidden');
+                return;
+            }
+
+            $list->appendChild($meta);
+
+            return;
         }
 
-        $item->appendChild($meta);
+        $first = $list->firstChild;
+        if ($first instanceof DOMNode) {
+            $list->insertBefore($meta, $first);
+
+            return;
+        }
+
+        $list->appendChild($meta);
+    }
+
+    /**
+     * HR: Uspoređuje audit retke prenosivim ISO vremenom i verzijom kao rezervom.
+     * EN: Compares audit rows by portable ISO time and version as a fallback.
+     *
+     * @param array<string,mixed> $candidate
+     * @param array<string,mixed>|null $current
+     */
+    private function isNewerState(array $candidate, ?array $current): bool
+    {
+        if ($current === null) {
+            return true;
+        }
+
+        $candidateTime = is_scalar($candidate['updated_at'] ?? null)
+            ? trim((string)$candidate['updated_at'])
+            : '';
+        $currentTime = is_scalar($current['updated_at'] ?? null)
+            ? trim((string)$current['updated_at'])
+            : '';
+        if ($candidateTime !== $currentTime) {
+            return $candidateTime > $currentTime;
+        }
+
+        $candidateVersion = is_scalar($candidate['state_version'] ?? null)
+            ? (int)$candidate['state_version']
+            : 0;
+        $currentVersion = is_scalar($current['state_version'] ?? null)
+            ? (int)$current['state_version']
+            : 0;
+
+        return $candidateVersion > $currentVersion;
     }
 
     /**
@@ -272,24 +392,30 @@ final readonly class TaskHtmlRenderer
      * HR: Vraća kratke lokalizirane oznake koje JavaScript treba nakon promjene stanja.
      * EN: Returns compact localized labels needed by JavaScript after a state change.
      *
-     * @return array{last_changed:string,close:string,csrf_error:string,save_error:string}
+     * @return array{list:string,last_changed:string,close:string,csrf_error:string,save_error:string,follow:string,unfollow:string}
      */
     private function clientLabels(string $language): array
     {
         if (str_starts_with(strtolower(trim($language)), 'hr')) {
             return [
+                'list' => 'Lista zadataka',
                 'last_changed' => 'Zadnja promjena',
                 'close' => 'Zatvori',
                 'csrf_error' => 'CSRF token nije dostupan.',
                 'save_error' => 'Stanje zadatka nije moguće spremiti.',
+                'follow' => 'Prati listu zadataka',
+                'unfollow' => 'Prestani pratiti listu zadataka',
             ];
         }
 
         return [
+            'list' => 'Task list',
             'last_changed' => 'Last changed',
             'close' => 'Close',
             'csrf_error' => 'CSRF token is unavailable.',
             'save_error' => 'Task state could not be saved.',
+            'follow' => 'Follow task list',
+            'unfollow' => 'Unfollow task list',
         ];
     }
 

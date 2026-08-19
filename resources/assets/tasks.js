@@ -47,6 +47,84 @@
     };
 
     /**
+     * HR: Dodaje jedan gumb praćenja cijeloj listi kada ga je aplikacijski modul oglasio.
+     * EN: Adds one follow button to the whole list when advertised by the application module.
+     */
+    const enhanceFollowing = (list) => {
+        if (!list.dataset.taskFollowToggleUrl || !list.dataset.taskFollowStatusUrl) {
+            return;
+        }
+
+        const meta = list.querySelector('.editor-task-list-meta');
+        const listUuid = list.dataset.taskListUuid || '';
+        if (!(meta instanceof HTMLElement) || !listUuid) {
+            return;
+        }
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-secondary btn-sm editor-task-list-follow';
+        button.textContent = list.dataset.taskFollowLabel || 'Follow task list';
+        button.setAttribute('aria-pressed', 'false');
+        meta.hidden = false;
+        meta.appendChild(button);
+
+        const statusUrl = new URL(list.dataset.taskFollowStatusUrl, window.location.origin);
+        statusUrl.searchParams.set('target_type', 'task_list');
+        statusUrl.searchParams.set('target_id', listUuid);
+        fetch(statusUrl, {credentials: 'same-origin', headers: {'Accept': 'application/json'}})
+            .then((response) => response.ok ? response.json() : null)
+            .then((payload) => {
+                if (!payload) return;
+                const following = payload.following === true;
+                button.classList.toggle('is-following', following);
+                button.textContent = following
+                    ? (list.dataset.taskUnfollowLabel || 'Unfollow task list')
+                    : (list.dataset.taskFollowLabel || 'Follow task list');
+                button.setAttribute('aria-pressed', following ? 'true' : 'false');
+            })
+            .catch(() => {});
+
+        button.addEventListener('click', async () => {
+            button.disabled = true;
+            try {
+                const token = await csrf(list);
+                const data = new URLSearchParams();
+                data.set(token.name, token.token);
+                data.set('target_type', 'task_list');
+                data.set('target_id', listUuid);
+                data.set('document_id', list.dataset.taskDocument || '');
+                data.set('label', list.dataset.taskListLabel || '');
+                data.set('return_url', `${window.location.pathname}${window.location.search}`);
+                const response = await fetch(list.dataset.taskFollowToggleUrl, {
+                    method: 'POST',
+                    body: data,
+                    credentials: 'same-origin',
+                    headers: {'Accept': 'text/html'},
+                    redirect: 'follow',
+                });
+                if (!response.ok) {
+                    throw new Error(list.dataset.taskSaveError || 'Follow could not be saved.');
+                }
+
+                window.location.reload();
+            } catch (error) {
+                toast(
+                    error instanceof Error ? error.message : list.dataset.taskSaveError,
+                    list.dataset.taskCloseLabel || 'Close',
+                );
+                button.disabled = false;
+            }
+        });
+    };
+
+    document.querySelectorAll('.editor-task-list').forEach((list) => {
+        if (list instanceof HTMLElement) {
+            enhanceFollowing(list);
+        }
+    });
+
+    /**
      * HR: Formatira audit vrijeme prema jeziku dokumenta u pregledniku.
      * EN: Formats the audit timestamp for the document language in the browser.
      */
@@ -72,8 +150,8 @@
     };
 
     /**
-     * HR: Automatski sprema promjenu zadatka i osvježava njegov audit tekst.
-     * EN: Automatically saves a task change and refreshes its audit text.
+     * HR: Automatski sprema promjenu zadatka i osvježava zajednički audit liste.
+     * EN: Automatically saves a task change and refreshes the list's shared audit.
      */
     document.addEventListener('change', async (event) => {
         const checkbox = event.target;
@@ -111,12 +189,15 @@
             }
 
             item.classList.toggle('editor-task-item-completed', desired);
-            let audit = item.querySelector('.editor-task-audit');
+            let audit = list.querySelector('.editor-task-list-audit');
             const state = payload.state || {};
             if (!(audit instanceof HTMLElement)) {
                 audit = document.createElement('small');
-                audit.className = 'editor-task-audit';
-                item.appendChild(audit);
+                audit.className = 'editor-task-list-audit';
+                const meta = list.querySelector('.editor-task-list-meta');
+                if (meta instanceof HTMLElement) {
+                    meta.prepend(audit);
+                }
             }
             const language = (checkbox.dataset.taskLanguage || '').toLowerCase();
             const label = list.dataset.taskLastChangedLabel || 'Last changed';

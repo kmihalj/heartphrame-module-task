@@ -117,3 +117,12 @@ provjeru. Definicije ostaju dio izmjene Editor stranice. Vidi
 
 Vidi [sigurnosnu kopiju i povrat](backup_hr.md) za potpuno stanje/povijest
 zadataka i backup ograničen na područje.
+
+## 8. Događaj osobnog praćenja
+
+Stvarni završetak ili ponovno otvaranje objavljuje `TaskChanged` s UUID-om
+zadatka, stabilnim UUID-om njegove liste, ID-em dokumenta, izvršiteljem te
+sigurnim nazivima retka i liste. Simbioza User može dodati jednu opcionalnu
+kontrolu praćenja cijele liste i obraditi događaj bez znanja Task modula o
+pravilima obavijesti. Renderer jednako prikazuje samo najnoviju promjenu cijele
+liste, nikada poseban audit red uz svaki zadatak.

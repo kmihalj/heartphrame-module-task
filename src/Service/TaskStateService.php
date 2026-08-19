@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace AaiEduHr\HeartPhrameModuleTask\Service;
 
 use AaiEduHr\HeartPhrameModuleOrm\Database\Database;
+use AaiEduHr\HeartPhrameModuleTask\Event\TaskChanged;
 use AaiEduHr\HeartPhrameModuleTask\ModuleTask;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 
 use function array_values;
@@ -36,8 +38,10 @@ final readonly class TaskStateService
      * HR: Prima prenosivi ORM database servis.
      * EN: Receives the portable ORM database service.
      */
-    public function __construct(private Database $database)
-    {
+    public function __construct(
+        private Database $database,
+        private ?EventDispatcherInterface $events = null,
+    ) {
     }
 
     /**
@@ -175,7 +179,27 @@ final readonly class TaskStateService
             throw new RuntimeException(__('Spremljeno stanje zadatka nije moguće učitati.'));
         }
 
+        $this->dispatch(new TaskChanged(
+            $completed ? 'completed' : 'reopened',
+            $task->uuid,
+            $task->listUuid,
+            trim($documentId),
+            $task->text,
+            $task->listLabel,
+            $userId,
+        ));
+
         return $this->stringKeyedRow($result);
+    }
+
+    /** HR: Sigurno objavljuje sekundarni događaj nakon uspješnog commita. EN: Safely dispatches the secondary event after a successful commit. */
+    private function dispatch(TaskChanged $event): void
+    {
+        try {
+            $this->events?->dispatch($event);
+        } catch (\Throwable) {
+            // HR: Stanje zadatka ostaje primarni zapis. EN: Task state remains the primary record.
+        }
     }
 
     /**

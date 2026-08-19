@@ -9,6 +9,7 @@ use AaiEduHr\HeartPhrameModuleOrm\Database\Database;
 use AaiEduHr\HeartPhrameModuleOrm\Database\Migration\ReversibleMigrationInterface;
 use AaiEduHr\HeartPhrameModuleTask\Api\TaskApiException;
 use AaiEduHr\HeartPhrameModuleTask\Api\TaskApiService;
+use AaiEduHr\HeartPhrameModuleTask\Event\TaskChanged;
 use AaiEduHr\HeartPhrameModuleTask\Service\TaskApiDocumentAccessInterface;
 use AaiEduHr\HeartPhrameModuleTask\Service\TaskDefinition;
 use AaiEduHr\HeartPhrameModuleTask\Service\TaskDefinitionParser;
@@ -16,6 +17,7 @@ use AaiEduHr\HeartPhrameModuleTask\Service\TaskStateService;
 use HeartPhrame\Config\Config;
 use HeartPhrame\Helper\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -24,6 +26,7 @@ use RuntimeException;
 #[CoversClass(TaskDefinition::class)]
 #[CoversClass(TaskDefinitionParser::class)]
 #[CoversClass(TaskStateService::class)]
+#[UsesClass(TaskChanged::class)]
 final class TaskApiServiceTest extends TestCase
 {
     private Database $database;
@@ -62,12 +65,14 @@ final class TaskApiServiceTest extends TestCase
             '5adf2862-a532-4d66-b916-b977284fc159',
             'Provjeri dokument',
             'editors',
+            'Objava dokumenta',
         );
         $second = new TaskDefinition(
             '139c506d-d3e3-463e-af17-b19447d467dc',
             '5adf2862-a532-4d66-b916-b977284fc159',
             'Objavi dokument',
             'viewers',
+            'Objava dokumenta',
         );
         $access = $this->createMock(TaskApiDocumentAccessInterface::class);
         $access->expects($this->once())

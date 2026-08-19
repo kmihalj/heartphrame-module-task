@@ -88,6 +88,11 @@ Every POST operation reloads the published document, confirms that the task
 still exists, rechecks read and toggle permissions, and writes an event only
 when the state actually changes.
 
+After a real state transition, Task publishes a neutral `TaskChanged` event with
+both the task and stable task-list identities. The optional
+`aaieduhr/simbioza-module-user` integration adds one follow control and one
+latest-change summary per complete task list while Task remains independently usable.
+
 ## Documentation
 
 The detailed architecture, storage model, integration contract, and operating

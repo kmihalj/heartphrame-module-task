@@ -6,16 +6,20 @@ namespace AaiEduHr\HeartPhrameModuleTask\Tests;
 
 use AaiEduHr\HeartPhrameModuleOrm\Database\Database;
 use AaiEduHr\HeartPhrameModuleOrm\Database\Migration\ReversibleMigrationInterface;
+use AaiEduHr\HeartPhrameModuleTask\Event\TaskChanged;
 use AaiEduHr\HeartPhrameModuleTask\ModuleTask;
 use AaiEduHr\HeartPhrameModuleTask\Service\TaskDefinition;
 use AaiEduHr\HeartPhrameModuleTask\Service\TaskStateService;
 use HeartPhrame\Config\Config;
 use HeartPhrame\Helper\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 #[CoversClass(TaskStateService::class)]
 #[CoversClass(TaskDefinition::class)]
+#[UsesClass(TaskChanged::class)]
 final class TaskStateServiceTest extends TestCase
 {
     private Database $database;
@@ -84,6 +88,7 @@ final class TaskStateServiceTest extends TestCase
             '5adf2862-a532-4d66-b916-b977284fc159',
             'Provjeri dokument',
             'editors',
+            'Objava dokumenta',
         );
 
         $first = $this->states->setState($task, 'document-a', true, 7, 'Ana Horvat');
@@ -97,5 +102,40 @@ final class TaskStateServiceTest extends TestCase
         $this->assertCount(1, $this->states->history('document-b', $task->uuid));
         $this->assertTrue((bool)$this->states->statesFor('document-a', [$task->uuid])[$task->uuid]['is_completed']);
         $this->assertFalse((bool)$this->states->statesFor('document-b', [$task->uuid])[$task->uuid]['is_completed']);
+    }
+
+    /**
+     * HR: Događaj nosi identitet cijele liste i promijenjenog retka za precizno praćenje.
+     * EN: The event carries both the whole-list and changed-row identities for precise following.
+     */
+    public function testChangedEventContainsTaskListIdentity(): void
+    {
+        $events = new class implements EventDispatcherInterface {
+            /** @var list<object> */
+            public array $dispatched = [];
+
+            public function dispatch(object $event): object
+            {
+                $this->dispatched[] = $event;
+
+                return $event;
+            }
+        };
+        $task = new TaskDefinition(
+            'e3d1be37-04fd-4f69-ad6e-39fa9f085223',
+            '5adf2862-a532-4d66-b916-b977284fc159',
+            'Provjeri dokument',
+            'editors',
+            'Objava dokumenta',
+        );
+
+        (new TaskStateService($this->database, $events))
+            ->setState($task, 'document-a', true, 7, 'Ana Horvat');
+
+        self::assertCount(1, $events->dispatched);
+        self::assertInstanceOf(TaskChanged::class, $events->dispatched[0]);
+        self::assertSame($task->listUuid, $events->dispatched[0]->listUuid);
+        self::assertSame($task->listLabel, $events->dispatched[0]->listLabel);
+        self::assertSame($task->uuid, $events->dispatched[0]->taskUuid);
     }
 }

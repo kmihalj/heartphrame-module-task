@@ -34,7 +34,10 @@ $services = [
     TaskDefinitionParser::class => static fn(): TaskDefinitionParser => new TaskDefinitionParser(),
 
     TaskStateService::class => static fn(ContainerInterface $container): TaskStateService =>
-        new TaskStateService($container->get(Database::class)),
+        new TaskStateService(
+            $container->get(Database::class),
+            $container->get(\Psr\EventDispatcher\EventDispatcherInterface::class),
+        ),
 
     TaskDocumentAccess::class => static fn(ContainerInterface $container): TaskDocumentAccess =>
         new TaskDocumentAccess(

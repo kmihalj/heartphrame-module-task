@@ -88,6 +88,11 @@ Svaka POST operacija ponovno učitava objavljeni dokument, potvrđuje da zadatak
 još postoji, ponovno provjerava pravo čitanja i označavanja te zapisuje događaj
 samo kada se stanje stvarno promijeni.
 
+Nakon stvarne promjene stanja Task objavljuje neutralni događaj `TaskChanged` s
+identitetom zadatka i njegove stabilne liste. Opcionalni
+`aaieduhr/simbioza-module-user` dodaje jednu kontrolu praćenja i jedan sažetak
+zadnje promjene po cijeloj listi zadataka, a Task ostaje samostalno uporabiv.
+
 ## Dokumentacija
 
 Detaljna arhitektura, model pohrane, integracijski ugovor i operativne upute

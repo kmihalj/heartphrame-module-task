@@ -8,7 +8,16 @@
 .editor-task-list > h2,
 .editor-task-list > h3,
 .editor-task-list > h4 {
+    margin: 0 0 .35rem;
+}
+
+.editor-task-list-meta {
+    align-items: center;
+    display: flex;
+    gap: .75rem;
+    justify-content: space-between;
     margin: 0 0 .75rem;
+    min-width: 0;
 }
 
 .editor-task-list ul {
@@ -47,10 +56,27 @@
     text-decoration: line-through;
 }
 
-.editor-task-audit {
+.editor-task-list-audit {
     color: var(--bs-secondary-color, #6c757d);
     display: block;
-    margin: .2rem 0 0 1.9rem;
+    min-width: 0;
+}
+
+.editor-task-list-follow {
+    flex: 0 0 auto;
+    opacity: .82;
+}
+
+.editor-task-list-follow:hover,
+.editor-task-list-follow:focus-visible,
+.editor-task-list-follow.is-following {
+    opacity: 1;
+}
+
+.editor-task-list-follow.is-following {
+    background: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-white);
 }
 
 .editor-task-checkbox:disabled {
@@ -95,5 +121,10 @@
 @media (max-width: 575.98px) {
     .editor-task-list {
         padding: .75rem;
+    }
+
+    .editor-task-list-meta {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }

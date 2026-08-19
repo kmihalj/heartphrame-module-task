@@ -51,6 +51,13 @@ final class TaskDefinitionParser
                 continue;
             }
 
+            /*
+             * HR: Naslov je zajednički naziv liste za prikaz i praćenje. Ne
+             *     izvodi se iz teksta prvog retka jer se retci mogu mijenjati.
+             * EN: The heading is the shared list label for display and following.
+             *     It is not derived from the first row because rows may change.
+             */
+            $listLabel = $this->listLabel($xpath, $list);
             $scope = $list->getAttribute('data-task-toggle-scope') === 'viewers'
             ? 'viewers'
             : 'editors';
@@ -79,11 +86,28 @@ final class TaskDefinitionParser
                     $listUuid,
                     $text,
                     $scope,
+                    $listLabel,
                 );
             }
         }
 
         return $definitions;
+    }
+
+    /**
+     * HR: Čita prvi naslov liste bez pretpostavke o njegovoj HTML razini.
+     * EN: Reads the list's first heading without assuming its HTML level.
+     */
+    private function listLabel(DOMXPath $xpath, DOMElement $list): string
+    {
+        $headings = $xpath->query('.//*[self::h2 or self::h3 or self::h4][1]', $list);
+        if ($headings === false) {
+            return '';
+        }
+
+        $heading = $headings->item(0);
+
+        return $heading instanceof DOMElement ? trim($heading->textContent) : '';
     }
 
     /**

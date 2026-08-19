@@ -34,6 +34,7 @@ HTML;
 
         $this->assertCount(2, $definitions);
         $this->assertSame('Prvi zadatak', $definitions[0]->text);
+        $this->assertSame('Zadaci', $definitions[0]->listLabel);
         $this->assertSame('viewers', $definitions[0]->scope);
         $this->assertSame(
             'a03d850b-2d60-491c-a659-ed4a3fbc646c',

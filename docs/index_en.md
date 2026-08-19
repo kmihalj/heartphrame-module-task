@@ -117,3 +117,11 @@ Definitions remain part of Editor page writes. See [API integration](api_en.md).
 
 See [Backup and restore](backup_en.md) for complete and workspace-scoped task
 state and audit history.
+
+## 8. Personal following event
+
+A real completion or reopen transition emits `TaskChanged` with the task UUID,
+stable task-list UUID, document ID, actor, and safe task/list labels. Simbioza
+User may add one optional follow control for the entire list and consume the
+event without Task knowing its notification policy. Rendering likewise shows
+only the newest change across that list, never one audit line per task row.
